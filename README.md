@@ -39,4 +39,10 @@ php artisan serve
 📌 Future Features
 🔄 API Development (for frontend integration)
 🎨 UI Improvements (Tailwind CSS)
-🛠 Admin Panel for managing users
+🛠 Admin Panel for managing users 
+
+📢 Contributions & Feedback
+Feel free to fork this repository, submit PRs, or open issues for suggestions.
+
+Made with ❤️ by thusharanavod123
+
