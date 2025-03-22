@@ -14,25 +14,50 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
-        $data = $request->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6'
         ]);
 
-        $user = User::create(['name' => $data['name'], 'email' => $data['email'], 'password' => Hash::make($data['password'])]);
-        return response()->json(['user' => $user, 'token' => $user->createToken('auth_token')->plainTextToken], 201);
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'password' => Hash::make($validatedData['password'])
+        ]);
+
+        return response()->json([
+            'user' => $user,
+            'token' => $user->createToken('auth_token')->plainTextToken
+        ], 201);
     }
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
+
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
         }
-        $user = User::where('email', $request->email)->firstOrFail();
-        return response()->json(['user' => $user, 'token' => $user->createToken('auth_token')->plainTextToken], 200);
+
+        $user = Auth::user();
+        return response()->json([
+            'user' => $user,
+            'token' => $user->createToken('auth_token')->plainTextToken
+        ], 200);
     }
 
-    public function profile() { return response()->json(['user' => Auth::user()], 200); }
-    public function logout() { Auth::user()->tokens()->delete(); return response()->json(['message' => 'Logged out'], 200); }
+    public function profile()
+    {
+        return response()->json(['user' => Auth::user()], 200);
+    }
+
+    public function logout()
+    {
+        Auth::user()->tokens()->delete();
+        return response()->json(['message' => 'Successfully logged out'], 200);
+    }
 }
